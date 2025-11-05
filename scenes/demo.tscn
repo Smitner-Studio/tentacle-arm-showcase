@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://dec6sm6m68snh"]
+
+[ext_resource type="Script" uid="uid://bvne1f46nq8cd" path="res://scripts/DebugDraw.gd" id="1_tqfh0"]
+[ext_resource type="PackedScene" uid="uid://j3gcywxflkf1" path="res://scenes/arm.tscn" id="2_ba4lm"]
+[ext_resource type="PackedScene" uid="uid://dqvqac7rqkedq" path="res://scenes/arm_target.tscn" id="2_l20p6"]
+
+[node name="demo" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(256, 256)
+zoom = Vector2(4, 4)
+
+[node name="Arm" parent="." instance=ExtResource("2_ba4lm")]
+
+[node name="ArmTarget" parent="." instance=ExtResource("2_l20p6")]
+position = Vector2(365, 160)
+
+[node name="DebugDraw" type="Node2D" parent="." node_paths=PackedStringArray("arm")]
+process_mode = 3
+script = ExtResource("1_tqfh0")
+arm = NodePath("../Arm")
+current_mode = 3
+point_size = 1.0
+point_color = Color(0, 0, 0, 1)
+direction_length = 3.0
+direction_width = 0.5
+wave_length = 5.0
+wave_width = 0.5

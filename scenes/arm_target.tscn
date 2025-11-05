@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://dqvqac7rqkedq"]
+
+[ext_resource type="Script" uid="uid://obsbqcftfxyw" path="res://scripts/DraggableTarget.gd" id="1_qeif2"]
+[ext_resource type="Texture2D" uid="uid://di07qtt1m7vpk" path="res://sprites/target.png" id="2_gtn3y"]
+
+[node name="ArmTarget" type="Node2D"]
+z_index = 2
+z_as_relative = false
+script = ExtResource("1_qeif2")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("2_gtn3y")

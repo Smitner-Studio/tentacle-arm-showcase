@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Tapered wavy arm - thick base to thin tip -->
+  <path d="M 2 14 Q 3 12.5, 4 11" stroke="#e0e0e0" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M 4 11 Q 5 10.25, 6 10" stroke="#e0e0e0" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <path d="M 6 10 Q 7 9.5, 8 9" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M 8 9 Q 9 8, 10 7" stroke="#e0e0e0" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <path d="M 10 7 Q 11 6, 12 5" stroke="#e0e0e0" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M 12 5 Q 13 3.5, 14 2" stroke="#e0e0e0" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+</svg>
