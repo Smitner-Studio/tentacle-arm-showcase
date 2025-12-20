@@ -1,0 +1,23 @@
+[gd_scene load_steps=7 format=3 uid="uid://cgg7gb01rjef3"]
+
+[ext_resource type="Script" uid="uid://jlyriv8pwmr7" path="res://scripts/Eye.gd" id="1_script"]
+[ext_resource type="Shader" uid="uid://bssv76xcvltxu" path="res://shaders/eye_tracking.gdshader" id="2_shader"]
+[ext_resource type="Texture2D" uid="uid://goveieejhrk" path="res://sprites/Eye_Lid.png" id="4_lid"]
+[ext_resource type="Texture2D" uid="uid://bs7x5cmrf1t1q" path="res://sprites/Eye_Pupil.png" id="5_7wf7k"]
+[ext_resource type="Texture2D" uid="uid://lsi56ua31bal" path="res://sprites/Eye_Mask.png" id="5_mask"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eye"]
+resource_local_to_scene = true
+shader = ExtResource("2_shader")
+shader_parameter/target_offset = Vector2i(0, 0)
+shader_parameter/max_distance = 3
+shader_parameter/eyelid_texture = ExtResource("4_lid")
+shader_parameter/mask_texture = ExtResource("5_mask")
+
+[node name="Eye" type="Node2D" node_paths=PackedStringArray("eye_sprite")]
+script = ExtResource("1_script")
+eye_sprite = NodePath("Sprite")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_eye")
+texture = ExtResource("5_7wf7k")

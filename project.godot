@@ -11,21 +11,28 @@ config_version=5
 [application]
 
 config/name="Tentacle Arm Showcase"
-config/features=PackedStringArray("4.4", "GL Compatibility")
+run/main_scene="uid://dec6sm6m68snh"
+config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="uid://k738biuidln7"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
+window/subwindows/embed_subwindows=false
 window/stretch/scale_mode="integer"
 
 [file_customization]
 
 folder_colors={
+"res://fonts/": "gray",
+"res://progression/": "gray",
 "res://scenes/": "red",
 "res://scripts/": "green",
-"res://shaders/": "purple"
+"res://shaders/": "purple",
+"res://sprites/": "blue",
+"res://svg/": "gray",
+"res://visualizations/": "gray"
 }
 
 [rendering]

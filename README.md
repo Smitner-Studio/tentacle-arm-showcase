@@ -1,6 +1,6 @@
 # Tentacle Arm
 
-A Godot 4.4 project showcasing procedural tentacle animation using FABRIK with some flare.
+A Godot 4.5 project showcasing procedural tentacle animation using FABRIK with some flare.
 
 ## Features
 

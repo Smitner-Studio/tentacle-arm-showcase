@@ -10,6 +10,19 @@ class_name Arm extends Node2D
 ## 4. Final constraint pass keeps everything in check. ¯\_(⊙_ʖ⊙)_/¯
 ##
 ## The @tool annotation makes it work in the editor, cool.
+##
+## PUBLIC EYE API:
+## - add_eye() -> EyeData: Spawns eye at first available position
+## - remove_eye(eye_data) -> void: Removes specific eye
+## - get_eye_count() -> int: Returns current count
+## - get_eyes() -> Array[EyeData]: Returns all eyes for debugging
+
+## Tracks each spawned eye's state
+class EyeData:
+	var node: Eye
+	var segment_index: int
+	var side: int  # +1 or -1 for alternating sides 
+	var offset_distance: float
 
 #region Exports
 @export_group("Node References")
@@ -84,6 +97,16 @@ class_name Arm extends Node2D
 ## Exaggerated shadow at tip emphasizes the arm reaching outward
 @export var max_shadow_offset: Vector2 = Vector2(0, 20)
 
+@export_group("Eyes")
+## Container node for spawned eyes (should be inside SubViewport for outline treatment)
+@export var eye_container: Node2D
+## Eye scene to instantiate when add_eye() is called
+@export var eye_scene: PackedScene
+## Minimum segments between eyes - prevents clustering
+@export_range(1, 10, 1) var segment_spacing: int = 2
+## Perpendicular distance from arm centerline
+@export_range(1.0, 50.0, 1.0) var eye_offset_distance: float = 4.0
+
 #endregion
 
 #region Private Var
@@ -91,6 +114,7 @@ var _segments: Array[Vector2] = []
 var _segment_lengths: Array[float] = []
 var _base_position: Vector2
 var _wave_time: float = 0.0
+var _eyes: Array[EyeData] = []
 #endregion
 
 ## Runs on scene load and sets up segments.
@@ -111,6 +135,7 @@ func _physics_process(delta: float) -> void:
 	apply_constraints()
 
 	update_line2d()
+	_update_eyes()
 
 
 ## Two-pass FABRIK IK: backward pass pulls tip to target, forward pass anchors base.
@@ -173,9 +198,7 @@ func apply_constraints() -> void:
 ## Adds sine wave displacement perpendicular to arm direction so waves don't fight IK.
 ## Phase-based animation creates traveling waves from base to tip.
 func apply_wave_motion(delta: float) -> void:
-
-	# No amplitude, no wave!!
-	# (╯°o°）╯︵ ┻━┻
+	# No amplitude, no wave!! (╯°o°）╯︵ ┻━┻
 	if wave_amplitude <= 0.0:
 		return
 
@@ -271,3 +294,99 @@ func get_segments() -> Array[Vector2]:
 ## Returns target segment lengths for constraint visualization
 func get_segment_lengths() -> Array:
 	return _segment_lengths
+
+
+#region Eye API
+## Spawns an eye at the first available segment position.
+## Returns EyeData if successful, null if no room or missing dependencies.
+func add_eye() -> EyeData:
+	if not eye_container or not eye_scene:
+		return null
+	if _segments.size() < 4:
+		return null
+
+	var valid_index := _find_valid_segment()
+	if valid_index == -1:
+		return null  # No room for more eyes
+
+	var eye_instance: Eye = eye_scene.instantiate()
+	eye_container.add_child(eye_instance)
+
+	var eye_data := EyeData.new()
+	eye_data.node = eye_instance
+	eye_data.segment_index = valid_index
+	eye_data.side = 1 if (_eyes.size() % 2 == 0) else -1  # Alternate sides ┬─┬﻿ ノ( ゜-゜ノ)
+	eye_data.offset_distance = eye_offset_distance
+
+	_eyes.append(eye_data)
+	return eye_data
+
+
+## Removes a specific eye and frees its node, yeah, yeah, "use pools!11!!q", yeah yeah.
+func remove_eye(eye_data: EyeData) -> void:
+	if eye_data == null:
+		return
+
+	_eyes.erase(eye_data)
+	if is_instance_valid(eye_data.node):
+		eye_data.node.queue_free()
+
+
+## Returns current number of eyes.
+func get_eye_count() -> int:
+	return _eyes.size()
+
+
+## Returns all eyes for external inspection (debug visualization etc).
+func get_eyes() -> Array[EyeData]:
+	return _eyes
+#endregion
+
+
+#region Eye Private
+## Finds first valid segment index for a new eye.
+## Searches tip-to-base as tip is more visible... ;)
+func _find_valid_segment() -> int:
+	var segment_count := _segments.size()
+	if segment_count < 4:
+		return -1
+
+	# Collect used indices
+	var used: Array[int] = []
+	for eye_data in _eyes:
+		used.append(eye_data.segment_index)
+
+	# Search tip-to-base for first valid position
+	for candidate in range(segment_count - 3, 1, -1):
+		var is_valid := true
+		for u in used:
+			if abs(candidate - u) < segment_spacing:
+				is_valid = false
+				break
+		if is_valid:
+			return candidate
+
+	return -1
+
+
+## Updates all eye positions and targets each frame.
+func _update_eyes() -> void:
+	if not eye_container or _segments.size() < 4:
+		return
+
+	for eye_data in _eyes:
+		var idx := eye_data.segment_index
+		if idx < 1 or idx >= _segments.size():
+			continue
+
+		# Calculate world position perpendicular to arm direction
+		var direction := (_segments[idx] - _segments[idx - 1]).normalized()
+		var perpendicular := Vector2(-direction.y, direction.x)
+		var world_pos := _segments[idx] + perpendicular * eye_data.offset_distance * float(eye_data.side)
+
+		# Convert to eye_container's local space (inside SubViewport)
+		eye_data.node.position = eye_container.to_local(world_pos)
+
+		# Eyes track arm tip for creepy effect, but could be anything..
+		eye_data.node.set_target(_segments[-1])
+#endregion
